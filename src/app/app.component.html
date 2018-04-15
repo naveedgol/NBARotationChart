@@ -1,0 +1,11 @@
+<div class="main">
+    <div class="player" *ngFor="let playerId of getIter()">
+        <span class="player-name">{{players[playerId].firstName + ' ' + players[playerId].lastName}}</span>
+        <ng-container *ngFor="let rotation of players[playerId].rotations">
+            <span class="subbed-in"
+                [style.width.%]="(rotation.startTime - rotation.endTime)/720*20"
+                [style.visibility]="rotation.playing ? 'visible' : 'hidden'">
+            </span>
+        </ng-container>
+    </div>
+</div>
