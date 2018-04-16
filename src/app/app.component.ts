@@ -8,9 +8,6 @@ import { timeout } from 'q';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  rots: Rotation[] = []
-  homePlayers = [];
-  visitingPlayers = [];
   quarter = 1;
   players: Map<number, Player> = new Map<number, Player>();
 
@@ -19,35 +16,19 @@ export class AppComponent {
 
     this.getGameDetails().subscribe(
       data => {
-        for( let player of data['g']['hls']['pstsg'] ) {
-          this.players[player['pid']] = new Player(
-            player['fn'],
-            player['ln'],
-            data['g']['hls']['ta'],
-            [ new Rotation(player['court'] === 1, 48*60) ]
-          );
-        }
-        for( let player of data['g']['vls']['pstsg'] ) {
-          this.players[player['pid']] = new Player(
-            player['fn'],
-            player['ln'],
-            data['g']['vls']['ta'],
-            [ new Rotation(player['court'] === 1, 48*60) ]
-          );
-        }
-        console.log(this.players);
+        this.parseRoster(data['g']['hls']['pstsg'], data['g']['hls']['ta']); // home
+        this.parseRoster(data['g']['vls']['pstsg'], data['g']['vls']['ta']); // visitors
       }
     );
 
     this.getPbp().subscribe(
       data => {
-        console.log(data);
-        for ( let q = 0; q < data['g']['pd'].length; ++q ) {
-          for ( let i = 0; i < data['g']['pd'][q]['pla'].length; ++i ) {
-            if ( data['g']['pd'][q]['pla'][i]['etype'] === 8 ) {
-              let playerInId = data['g']['pd'][q]['pla'][i]['epid'];
-              let playerOutId = data['g']['pd'][q]['pla'][i]['pid'];
-              let time = data['g']['pd'][q]['pla'][i]['cl']; //XX:XX
+        for ( let quarter of data['g']['pd'] ) {
+          for ( let event of quarter['pla'] ) {
+            if ( event['etype'] === 8 ) { // substitution
+              let playerInId = event['epid'];
+              let playerOutId = event['pid'];
+              let time = event['cl']; //XX:XX
               let seconds = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)) + (4 - this.quarter)*60*12;
 
               //if you're subbing in and you're already "playing" means you were subbed out at the quarter
@@ -57,10 +38,7 @@ export class AppComponent {
               } else {
                 this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = seconds;
               }
-              this.players[playerInId].rotations.push(new Rotation(
-                true,
-                seconds
-              ));
+              this.players[playerInId].rotations.push(new Rotation(true, seconds));
 
               //if you're subbing out and you're already not "playing" means you were subbed in at the quarter
               if ( !this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].playing ) {
@@ -69,26 +47,31 @@ export class AppComponent {
               } else {
                 this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
               }
-              this.players[playerOutId].rotations.push(new Rotation(
-                false,
-                seconds
-              ));
-              // console.log("In:" + this.players[playerInId].lastName + " Out:" + this.players[playerOutId].lastName + " Time:" + seconds);
+              this.players[playerOutId].rotations.push(new Rotation(false,seconds));
             }
-            else if ( data['g']['pd'][q]['pla'][i]['etype'] === 13 ) {
-              for( let id of Object.keys(this.players) ) {
-                if ( this.quarter === 4 ) {
-                  this.players[id].rotations[this.players[id].rotations.length - 1].endTime = (4-this.quarter)*12*60;
-                }
-              }
+            else if ( event['etype'] === 13 ) { // end of quarter
               ++this.quarter;
+            } else if ( event['etype'] === 0 ) {
+              for( let id of Object.keys(this.players) ) { // end of game
+                this.players[id].rotations[this.players[id].rotations.length - 1].endTime = (4-this.quarter)*12*60;
+              }
             }
           }
         }
-        console.log(this.players);
       }
     );
 
+  }
+
+  parseRoster(rosterJson, team: string) {
+    for( let player of rosterJson ) {
+      this.players[player['pid']] = new Player(
+        player['fn'],
+        player['ln'],
+        team,
+        [ new Rotation(player['court'] === 1, 48*60) ]
+      );
+    }
   }
 
   getPbp() {
