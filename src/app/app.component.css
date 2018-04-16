@@ -6,10 +6,13 @@
 }
 
 .player-name {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     vertical-align: top;
-    font-size: 15px;
-    width: 19%;
+    font-size: 14px;
+    width: 10%;
+    margin-right: 2%;
     height: 100%;
     display: inline-block;
     text-align: right;
@@ -21,5 +24,17 @@
 }
 
 .player {
+    margin-bottom: 3px;
     height: 20px;
+}
+
+.header {
+    height: 20px;
+}
+.quarter-header {
+    display: inline-block;
+    height: 20px;
+    width: 20%;
+    font-size: 15px;
+    vertical-align: top;
 }
