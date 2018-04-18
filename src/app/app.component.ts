@@ -12,6 +12,7 @@ export class AppComponent {
   visitingTeam: string;
   homeScore: number;
   visitingScore: number;
+  playerIds: Player[][] = [[],[]];
 
   period = 1;
   allPeriods = [1,2,3,4];
@@ -47,12 +48,12 @@ export class AppComponent {
               let seconds =  this.periodStartTime(this.period + 1) - (parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)));
 
               // substitute IN
-              this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].playing = false;
+              this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].inGame = false;
               this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = seconds;
               this.players[playerInId].rotations.push(new Rotation(true, seconds));
 
               // subsitute OUT
-              this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].playing = true;
+              this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].inGame = true;
               this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
               this.players[playerOutId].rotations.push(new Rotation(false,seconds));
             }
@@ -70,10 +71,10 @@ export class AppComponent {
               const pid = event['pid'];
               const epid = event['epid'];
               if ( this.players[pid] ) {
-                this.players[pid].rotations[this.players[pid].rotations.length - 1].playing = true;
+                this.players[pid].rotations[this.players[pid].rotations.length - 1].inGame = true;
               }
               if ( this.players[epid] ) {
-                this.players[epid].rotations[this.players[epid].rotations.length - 1].playing = true;
+                this.players[epid].rotations[this.players[epid].rotations.length - 1].inGame = true;
               }
             }
           }
@@ -82,7 +83,7 @@ export class AppComponent {
         for( let id of Object.keys(this.players) ) {
           let i = 0;
           while ( i < this.players[id].rotations.length - 1 ) {
-            if ( this.players[id].rotations[i].playing === this.players[id].rotations[i+1].playing ) {
+            if ( this.players[id].rotations[i].inGame === this.players[id].rotations[i+1].inGame ) {
               this.players[id].rotations[i].endTime = this.players[id].rotations[i+1].endTime;
               this.players[id].rotations.splice(i+1, 1);
             } else {
@@ -90,14 +91,12 @@ export class AppComponent {
             }
           }
         }
-        console.log(this.players);
       }
     );
   }
 
   periodStartTime(period: number): number {
-    if( period <= 4 ) // regulation
-    {
+    if( period <= 4 ) { // regulation
       return 60*12*(period-1);
     } else { // OT
       return 60*12*4 + 60*5*(period-5);
@@ -106,12 +105,20 @@ export class AppComponent {
 
   parseRoster(rosterJson, team: string) {
     for( let player of rosterJson ) {
-      this.players[player['pid']] = new Player(
-        player['fn'],
-        player['ln'],
-        team,
-        [ new Rotation(player['court'] === 1, 0) ]
-      );
+      if ( player['min'] ) { // if the player plays
+        if ( team === this.homeTeam ) {
+          this.playerIds[0].push(player['pid']);
+        } else {
+          this.playerIds[1].push(player['pid']);
+        }
+
+        this.players[player['pid']] = new Player(
+          player['fn'],
+          player['ln'],
+          team,
+          [ new Rotation(player['court'] === 1, 0) ]
+        );
+      }
     }
   }
 
@@ -151,16 +158,16 @@ class Player {
 }
 
 class Rotation {
-  playing: boolean;
+  inGame: boolean;
   startTime: number;
   endTime: number;
 
   constructor(
-    playing: boolean,
+    inGame: boolean,
     startTime: number,
     endTime: number = -1
   ) {
-    this.playing = playing;
+    this.inGame = inGame;
     this.startTime = startTime;
     this.endTime = endTime;
   }
