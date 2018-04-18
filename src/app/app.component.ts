@@ -8,12 +8,11 @@ import { timeout } from 'q';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  quarter = 1;
+  period = 1;
   players: Map<number, Player> = new Map<number, Player>();
+  totalGameTime = 48*60 + 5*60;
 
   constructor( private http: HttpClient) {
-
-
     this.getGameDetails().subscribe(
       data => {
         this.parseRoster(data['g']['hls']['pstsg'], data['g']['hls']['ta']); // home
@@ -23,44 +22,71 @@ export class AppComponent {
 
     this.getPbp().subscribe(
       data => {
-        for ( let quarter of data['g']['pd'] ) {
-          for ( let event of quarter['pla'] ) {
+        // bugged if you play a whole period without subbing and without game activity
+        for ( let period of data['g']['pd'] ) {
+          for ( let event of period['pla'] ) {
             if ( event['etype'] === 8 ) { // substitution
               let playerInId = event['epid'];
               let playerOutId = event['pid'];
               let time = event['cl']; //XX:XX
-              let seconds = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)) + (4 - this.quarter)*60*12;
+              let seconds =  this.periodStartTime(this.period + 1) - (parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)));
 
-              //if you're subbing in and you're already "playing" means you were subbed out at the quarter
-              if ( this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].playing ) {
-                this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = (4 - this.quarter + 1)*60*12;
-                this.players[playerInId].rotations.push(new Rotation(false, (4 - this.quarter + 1)*60*12, seconds));
-              } else {
-                this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = seconds;
-              }
+              // substitute IN
+              this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].playing = false;
+              this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = seconds;
               this.players[playerInId].rotations.push(new Rotation(true, seconds));
 
-              //if you're subbing out and you're already not "playing" means you were subbed in at the quarter
-              if ( !this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].playing ) {
-                this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = (4 - this.quarter + 1)*60*12;
-                this.players[playerOutId].rotations.push(new Rotation(true, (4 - this.quarter + 1)*60*12, seconds));
-              } else {
-                this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
-              }
+              // subsitute OUT
+              this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].playing = true;
+              this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
               this.players[playerOutId].rotations.push(new Rotation(false,seconds));
             }
-            else if ( event['etype'] === 13 ) { // end of quarter
-              ++this.quarter;
-            } else if ( event['etype'] === 0 ) {
-              for( let id of Object.keys(this.players) ) { // end of game
-                this.players[id].rotations[this.players[id].rotations.length - 1].endTime = (4-this.quarter)*12*60;
+            else if ( event['etype'] === 13 ) { // end of period
+              ++this.period;
+              for( let id of Object.keys(this.players) ) {
+                this.players[id].rotations[this.players[id].rotations.length - 1].endTime = this.periodStartTime(this.period);
+                this.players[id].rotations.push(new Rotation(false, this.periodStartTime(this.period)));
+              }
+            } else if ( event['etype'] === 0 ) { // end of game
+              for( let id of Object.keys(this.players) ) {
+                this.players[id].rotations.pop();
+              }
+            } else {
+              const pid = event['pid'];
+              const epid = event['epid'];
+              if ( this.players[pid] ) {
+                this.players[pid].rotations[this.players[pid].rotations.length - 1].playing = true;
+              }
+              if ( this.players[epid] ) {
+                this.players[epid].rotations[this.players[epid].rotations.length - 1].playing = true;
               }
             }
           }
         }
+        // merge continous play over quarters
+        for( let id of Object.keys(this.players) ) {
+          let i = 0;
+          while ( i < this.players[id].rotations.length - 1 ) {
+            if ( this.players[id].rotations[i].playing === this.players[id].rotations[i+1].playing ) {
+              this.players[id].rotations[i].endTime = this.players[id].rotations[i+1].endTime;
+              this.players[id].rotations.splice(i+1, 1);
+            } else {
+              ++i;
+            }
+          }
+        }
+        console.log(this.players);
       }
     );
+  }
 
+  periodStartTime(period: number): number {
+    if( period <= 4 ) // regulation
+    {
+      return 60*12*(period-1);
+    } else { // OT
+      return 60*12*4 + 60*5*(period-5);
+    }
   }
 
   parseRoster(rosterJson, team: string) {
@@ -69,7 +95,7 @@ export class AppComponent {
         player['fn'],
         player['ln'],
         team,
-        [ new Rotation(player['court'] === 1, 48*60) ]
+        [ new Rotation(player['court'] === 1, 0) ]
       );
     }
   }
