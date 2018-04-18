@@ -21,7 +21,8 @@
 }
 
 .main {
-    width: 100%;
+    width: 95%;
+    margin: 0 2.5%;
     font-size: 0;
 }
 
@@ -33,11 +34,28 @@
 .header {
     height: 20px;
 }
+
 .period-header {
     display: inline-block;
     height: 20px;
-    /* width: 20%; */
-    border-left: 1px solid black;
+    /* border-left: 1px solid black; */
     font-size: 15px;
     vertical-align: top;
+}
+
+.scoreboard {
+    text-align: center;
+    height: 170px;
+    margin-bottom: 5px;
+}
+
+.score {
+    font-size: 70px;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 45px;
+}
+
+.team-logo {
+    height: 100%;
 }

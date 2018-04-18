@@ -8,6 +8,11 @@ import { timeout } from 'q';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  homeTeam: string;
+  visitingTeam: string;
+  homeScore: number;
+  visitingScore: number;
+
   period = 1;
   allPeriods = [1,2,3,4];
   players: Map<number, Player> = new Map<number, Player>();
@@ -21,8 +26,12 @@ export class AppComponent {
           this.allPeriods.push(i);
         }
         this.totalGameTime = this.periodStartTime(totalPeriods + 1);
-        this.parseRoster(data['g']['hls']['pstsg'], data['g']['hls']['ta']); // home
-        this.parseRoster(data['g']['vls']['pstsg'], data['g']['vls']['ta']); // visitors
+        this.homeTeam = data['g']['hls']['ta'];
+        this.homeScore = data['g']['hls']['s'];
+        this.visitingTeam = data['g']['vls']['ta'];
+        this.visitingScore = data['g']['vls']['s'];
+        this.parseRoster(data['g']['hls']['pstsg'], this.homeTeam);
+        this.parseRoster(data['g']['vls']['pstsg'], this.visitingTeam);
       }
     );
 
