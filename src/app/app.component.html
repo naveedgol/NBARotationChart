@@ -1,16 +1,18 @@
 <div class="main">
     <div class="header">
         <span class="player-name"></span>
-        <ng-container *ngFor="let quarter of [1,2,3,4]">
-            <span class="quarter-header"
-            [style.width.%]="80/totalGameTime*(12*60)"
+        <ng-container *ngFor="let period of allPeriods">
+            <span *ngIf="period <= 4" class="period-header"
+                [style.width.%]="80/totalGameTime*(12*60)"
             >
-                Q{{quarter}}
+                Q{{period}}
+            </span>
+            <span *ngIf="period > 4" class="period-header"
+            [style.width.%]="80/totalGameTime*(5*60)"
+            >
+                OT{{period-4}}
             </span>
         </ng-container>
-        <span class="quarter-header"
-            [style.width.%]="80/totalGameTime*(5*60)"
-            >OT1</span>
     </div>
     <ng-container *ngFor="let playerId of getIter()">
         <div class="player" *ngIf="!(players[playerId].rotations.length === 1 && !players[playerId].rotations[0].playing)">

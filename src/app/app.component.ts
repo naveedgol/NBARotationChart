@@ -9,12 +9,18 @@ import { timeout } from 'q';
 })
 export class AppComponent {
   period = 1;
+  allPeriods = [1,2,3,4];
   players: Map<number, Player> = new Map<number, Player>();
-  totalGameTime = 48*60 + 5*60;
+  totalGameTime = this.periodStartTime(4+1);
 
   constructor( private http: HttpClient) {
     this.getGameDetails().subscribe(
       data => {
+        const totalPeriods = data['g']['p'];
+        for ( let i = 5; i <= totalPeriods; ++i ) {
+          this.allPeriods.push(i);
+        }
+        this.totalGameTime = this.periodStartTime(totalPeriods + 1);
         this.parseRoster(data['g']['hls']['pstsg'], data['g']['hls']['ta']); // home
         this.parseRoster(data['g']['vls']['pstsg'], data['g']['vls']['ta']); // visitors
       }
