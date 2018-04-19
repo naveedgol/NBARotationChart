@@ -133,12 +133,12 @@ export class AppComponent {
 
   getPbp() {
     // return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/pbp/0021701225_full_pbp.json');
-    return this.http.get('../assets/pbp.json');
+    return this.http.get('./assets/pbp.json');
   }
 
   getGameDetails() {
     // return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/gamedetail/0021701225_gamedetail.json');
-    return this.http.get('../assets/details.json');
+    return this.http.get('./assets/details.json');
   }
 
   //http://stats.nba.com/js/data/widgets/boxscore_breakdown_20180411.json
