@@ -73,8 +73,12 @@
     width: 100%;
 }
 
+.score-chart {
+    opacity: 0.6;
+    position: absolute;
+    width: 100%;
+}
+
 .score-bar {
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
     display: inline-block;
 }

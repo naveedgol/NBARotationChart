@@ -95,14 +95,6 @@ export class AppComponent {
             }
           }
         }
-        let sum = 0;
-        for( let i = 0; i < this.scores.length - 1; ++i ) {
-          sum = sum + 88/this.totalGameTime*(this.scores[i+1].time-this.scores[i].time);
-          console.log(sum);
-          // sum + (this.scores[i+1].time - this.scores[i].time);
-        }
-        console.log(sum);
-        console.log(this.scores);
       }
     );
   }

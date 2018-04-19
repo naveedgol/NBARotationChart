@@ -33,6 +33,21 @@
             [style.height.px]="(playerIds[0].length+playerIds[1].length)*23 + 27"
             [style.left.%]="11 + 88/totalGameTime*periodStartTime(period)">
         </div>
+        <div
+            class="score-chart"
+            [style.margin-top.px]="23*playerIds[0].length - 100 + 15">
+            <div class="player-name"></div>
+            <ng-container *ngFor="let score of scores; let i = index">
+                <span
+                    [class]="'score-bar' + ' ' + ( score.differential > 0 ? homeTeam : visitingTeam)"
+                    [style.height.px]="score.differential < 0 ? score.differential*-10 : score.differential*10"
+                    [style.width.%]="i+1 !== scores.length ? (scores[i+1].time-score.time)/totalGameTime*88 : 0"
+                    [style.margin-bottom.px]="score.differential < 0 ? score.differential*10 : 0"
+                    [style.border-radius]="score.differential < 0 ? '0px 0px 2px 2px' : '2px 2px 0px 0px'"
+                >
+            </span>
+            </ng-container>
+        </div>
         <div *ngFor="let teamIds of playerIds">
             <div *ngFor="let playerId of teamIds" class="player">
                 <span class="player-name">
@@ -47,19 +62,6 @@
             </div>
             <div *ngIf="playerIds.indexOf(teamIds)===0" class="team-divisor"></div>
         </div>
-    </div>
-
-    <div class="data">
-        <div class="player-name"></div>
-        <ng-container *ngFor="let score of scores; let i = index">
-            <span
-                class="score-bar"
-                [style.height.px]="score.differential < 0 ? score.differential*-10 : score.differential*10"
-                [style.width.%]="i+1 !== scores.length ? (scores[i+1].time-score.time)/totalGameTime*88 : 0"
-                [style.background-color]="score.differential < 0 ? 'blue' : 'green'"
-            >
-        </span>
-        </ng-container>
     </div>
 
     <div class="header">
@@ -80,5 +82,4 @@
             </span>
         </ng-container>
     </div>
-
 </div>

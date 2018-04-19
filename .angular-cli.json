@@ -18,7 +18,8 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "assets/styles.css"
+        "assets/styles/nba.css",
+        "assets/styles/styles.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
