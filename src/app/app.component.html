@@ -1,29 +1,43 @@
 <div class="main">
+
     <div class="scoreboard">
         <span class="score">{{homeScore}}</span>
-        <img class="team-logo" src="{{'../assets/logos/' + homeTeam + '.svg'}}">
-        <img class="team-logo" src="{{'../assets/logos/' + visitingTeam + '.svg'}}">
+        <img class="team-logo" [src]="homeTeam ? '../assets/logos/' + homeTeam + '.svg' : ''">
+        <img class="team-logo" [src]="visitingTeam ? '../assets/logos/' + visitingTeam + '.svg': ''">
         <span class="score">{{visitingScore}}</span>
     </div>
+
     <div class="header">
         <span class="player-name"></span>
         <ng-container *ngFor="let period of allPeriods">
-            <span *ngIf="period <= 4" class="period-header"
-                [style.width.%]="88/totalGameTime*(12*60)"
-            >
-                Q{{period}}
+            <span
+                *ngIf="period <= 4"
+                class="period-header"
+                [style.width.%]="88/totalGameTime*(12*60)">
+                    Q{{period}}
             </span>
-            <span *ngIf="period > 4" class="period-header"
-            [style.width.%]="88/totalGameTime*(5*60)"
+            <span
+                *ngIf="period > 4"
+                class="period-header"
+                [style.width.%]="88/totalGameTime*(5*60)"
             >
                 OT{{period-4}}
             </span>
         </ng-container>
     </div>
-    <ng-container *ngFor="let teamIds of playerIds">
-        <ng-container *ngFor="let playerId of teamIds">
-            <div class="player">
-                <span class="player-name">{{players[playerId].firstName + ' ' + players[playerId].lastName}}</span>
+
+    <div class="data">
+        <div
+            *ngFor="let period of allPeriods"
+            class="period-line"
+            [style.height.px]="(playerIds[0].length+playerIds[1].length)*23 + 27"
+            [style.left.%]="11 + 88/totalGameTime*periodStartTime(period)">
+        </div>
+        <div *ngFor="let teamIds of playerIds">
+            <div *ngFor="let playerId of teamIds" class="player">
+                <span class="player-name">
+                    {{players[playerId].firstName + ' ' + players[playerId].lastName}}
+                </span>
                 <ng-container *ngFor="let rotation of players[playerId].rotations">
                     <span class="subbed-in"
                         [style.width.%]="(rotation.endTime - rotation.startTime)/totalGameTime*88"
@@ -31,6 +45,27 @@
                     </span>
                 </ng-container>
             </div>
+            <div *ngIf="playerIds.indexOf(teamIds)===0" class="team-divisor"></div>
+        </div>
+    </div>
+
+    <div class="header">
+        <span class="player-name"></span>
+        <ng-container *ngFor="let period of allPeriods">
+            <span
+                *ngIf="period <= 4"
+                class="period-header"
+                [style.width.%]="88/totalGameTime*(12*60)">
+                    Q{{period}}
+            </span>
+            <span
+                *ngIf="period > 4"
+                class="period-header"
+                [style.width.%]="88/totalGameTime*(5*60)"
+            >
+                OT{{period-4}}
+            </span>
         </ng-container>
-    </ng-container>
+    </div>
+
 </div>
