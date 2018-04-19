@@ -49,6 +49,19 @@
         </div>
     </div>
 
+    <div class="data">
+        <div class="player-name"></div>
+        <ng-container *ngFor="let score of scores; let i = index">
+            <span
+                class="score-bar"
+                [style.height.px]="score.differential < 0 ? score.differential*-10 : score.differential*10"
+                [style.width.%]="i+1 !== scores.length ? (scores[i+1].time-score.time)/totalGameTime*88 : 0"
+                [style.background-color]="score.differential < 0 ? 'blue' : 'green'"
+            >
+        </span>
+        </ng-container>
+    </div>
+
     <div class="header">
         <span class="player-name"></span>
         <ng-container *ngFor="let period of allPeriods">

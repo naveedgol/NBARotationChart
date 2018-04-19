@@ -72,3 +72,9 @@
     height: 30px;
     width: 100%;
 }
+
+.score-bar {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: inline-block;
+}

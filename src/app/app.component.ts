@@ -19,6 +19,8 @@ export class AppComponent {
   players: Map<number, Player> = new Map<number, Player>();
   totalGameTime = this.periodStartTime(4+1);
 
+  scores: ScoreDifferential[] = [new ScoreDifferential(0, 0)];
+
   constructor( private http: HttpClient) {
     this.getGameDetails().subscribe(
       data => {
@@ -44,8 +46,7 @@ export class AppComponent {
             if ( event['etype'] === 8 ) { // substitution
               let playerInId = event['epid'];
               let playerOutId = event['pid'];
-              let time = event['cl']; //XX:XX
-              let seconds =  this.periodStartTime(this.period + 1) - (parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)));
+              let seconds = this.clockToSecondsElapsed(event['cl']);
 
               // substitute IN
               this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].inGame = false;
@@ -68,6 +69,9 @@ export class AppComponent {
                 this.players[id].rotations.pop();
               }
             } else {
+              if ( event['etype'] === 1 || event['etype'] == 3 ) {
+                this.scores.push( new ScoreDifferential(event['hs']-event['vs'], this.clockToSecondsElapsed(event['cl'])));
+              }
               const pid = event['pid'];
               const epid = event['epid'];
               if ( this.players[pid] ) {
@@ -91,6 +95,14 @@ export class AppComponent {
             }
           }
         }
+        let sum = 0;
+        for( let i = 0; i < this.scores.length - 1; ++i ) {
+          sum = sum + 88/this.totalGameTime*(this.scores[i+1].time-this.scores[i].time);
+          console.log(sum);
+          // sum + (this.scores[i+1].time - this.scores[i].time);
+        }
+        console.log(sum);
+        console.log(this.scores);
       }
     );
   }
@@ -101,6 +113,11 @@ export class AppComponent {
     } else { // OT
       return 60*12*4 + 60*5*(period-5);
     }
+  }
+
+  clockToSecondsElapsed(clock: string): number {
+    // XX:XX to seconds
+    return this.periodStartTime(this.period + 1) - (parseInt(clock.substring(0,2))*60 + parseInt(clock.substring(3,5)));
   }
 
   parseRoster(rosterJson, team: string) {
@@ -167,5 +184,15 @@ class Rotation {
     this.inGame = inGame;
     this.startTime = startTime;
     this.endTime = endTime;
+  }
+}
+
+class ScoreDifferential {
+  differential: number; // point differential
+  time: number; //time since last point
+
+  constructor(differential, time) {
+    this.differential = differential;
+    this.time = time;
   }
 }
