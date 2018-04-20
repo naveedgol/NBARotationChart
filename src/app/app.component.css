@@ -68,6 +68,14 @@
     z-index: -1;
 }
 
+.middle-divisor {
+    height: 2px;
+    background-color: grey;
+    position: absolute;
+    width: 88%;
+    left: 11%;
+}
+
 .team-divisor {
     height: 30px;
     width: 100%;

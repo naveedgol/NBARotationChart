@@ -14,12 +14,14 @@ export class AppComponent {
   visitingScore: number;
   playerIds: Player[][] = [[],[]];
 
+
   period = 1;
   allPeriods = [1,2,3,4];
   players: Map<number, Player> = new Map<number, Player>();
   totalGameTime = this.periodStartTime(4+1);
 
   scores: ScoreDifferential[] = [new ScoreDifferential(0, 0)];
+  chartHeight = 0;
 
   constructor( private http: HttpClient) {
     this.getGameDetails().subscribe(
@@ -70,6 +72,9 @@ export class AppComponent {
               }
             } else {
               if ( event['etype'] === 1 || event['etype'] == 3 ) {
+                if ( this.chartHeight < event['hs']-event['vs'] ) {
+                  this.chartHeight = event['hs']-event['vs'];
+                }
                 this.scores.push( new ScoreDifferential(event['hs']-event['vs'], this.clockToSecondsElapsed(event['cl'])));
               }
               const pid = event['pid'];

@@ -33,9 +33,10 @@
             [style.height.px]="(playerIds[0].length+playerIds[1].length)*23 + 27"
             [style.left.%]="11 + 88/totalGameTime*periodStartTime(period)">
         </div>
+        <div class="middle-divisor" [style.margin-top.px]="23*playerIds[0].length + 15"></div>
         <div
             class="score-chart"
-            [style.margin-top.px]="23*playerIds[0].length - 100 + 15">
+            [style.margin-top.px]="23*playerIds[0].length - chartHeight*10 + 15">
             <div class="player-name"></div>
             <ng-container *ngFor="let score of scores; let i = index">
                 <span
