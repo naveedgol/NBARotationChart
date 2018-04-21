@@ -1,13 +1,117 @@
+.ATL {
+    background-color: #E03A3E;
+}
+
+.BOS {
+    background-color: #007A33;
+}
+
+.BKN {
+    background-color: #000000;
+}
+
+.CHA {
+    background-color: #1D1160;
+}
+
+.CHI {
+    background-color: #CE1141;
+}
+
+.CLE {
+    background-color: #6F263D;
+}
+
+.DAL {
+    background-color: #00538C;
+}
+
 .DEN {
+    background-color: #00285E;
+}
+
+.DET {
+    background-color: #ED174C;
+}
+
+.GSW {
     background-color: #FDB927;
+}
+
+.HOU {
+    background-color: #CE1141;
+}
+
+.IND {
+    background-color: #FDBB30;
+}
+
+.LAC {
+    background-color: #ED174C;
+}
+
+.LAL {
+    background-color: #552583;
+}
+
+.MEM {
+    background-color: #6189B9;
+}
+
+.MIA {
+    background-color: #98002E;
+}
+
+.MIL {
+    background-color: #00471B;
 }
 
 .MIN {
     background-color: #0C2340;
 }
 
+.NOP {
+    background-color: #0C2340;
+}
+
+.NYK {
+    background-color: #F58426;
+}
+
+.OKC {
+    background-color: #EF3B24;
+}
+
+.ORL {
+    background-color: #0077C0;
+}
+
+.PHI {
+    background-color: #006BB6;
+}
+
+.PHX {
+    background-color: #1D1160;
+}
+
+.POR {
+    background-color: #E03A3E;
+}
+
+.SAC {
+    background-color: #5A2D81;
+}
+
+.SAS {
+    background-color: #C4CED4;
+}
+
 .TOR {
     background-color: #CE1141;
+}
+
+.UTA {
+    background-color: #002B5C;
 }
 
 .WAS {

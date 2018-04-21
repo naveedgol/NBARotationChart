@@ -57,6 +57,17 @@
     margin-top: 45px;
 }
 
+@media screen and (max-width: 600px) {
+    .scoreboard {
+        height: 90px;
+        margin-bottom: 5px;
+    }
+    .score {
+        margin-top: 25px;
+        font-size: 35px;
+    }
+}
+
 .team-logo {
     height: 100%;
 }
@@ -89,4 +100,42 @@
 
 .score-bar {
     display: inline-block;
+}
+
+.boxscore {
+    width: 90px;
+    height: 100%;
+    padding: 4px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #eaeaea;
+    border-right: 1px #F6F6F6 solid;
+    display: inline-block;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.boxscore:hover {
+    opacity: 1;
+}
+
+.today-scores {
+    height: 50px;
+    white-space: nowrap;
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+.today-scores::-webkit-scrollbar {
+    display: none;
+}
+
+.boxscore-score {
+    float: right;
+}
+
+.loading {
+    font-size: 40px;
+    text-align: center;
 }

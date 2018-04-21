@@ -14,7 +14,7 @@ export class AppComponent {
   visitingScore: number;
   playerIds: Player[][] = [[],[]];
 
-
+  chartReady = false;
   period = 1;
   allPeriods = [1,2,3,4];
   players: Map<number, Player> = new Map<number, Player>();
@@ -23,8 +23,36 @@ export class AppComponent {
   scores: ScoreDifferential[] = [new ScoreDifferential(0, 0)];
   chartHeight = 0;
 
+  games: Game[] = [];
+
   constructor( private http: HttpClient) {
-    this.getGameDetails().subscribe(
+    this.getBoxScores().subscribe(
+      data => {
+        for ( let game of data['games'] ) {
+          this.games.push(new Game(
+            game['gameId'],
+            game['hTeam']['triCode'],
+            game['vTeam']['triCode'],
+            game['hTeam']['score'],
+            game['vTeam']['score']
+          ));
+        }
+        this.generateChart(this.games[0].id);
+      }
+    );
+  }
+
+  generateChart(gameId: string) {
+
+    this.chartReady = false;
+    this.players = new Map<number, Player>();
+    this.playerIds = [[],[]];
+    this.period = 1;
+    this.allPeriods = [1,2,3,4];
+    this.scores = [new ScoreDifferential(0, 0)];
+    this.chartHeight = 0;
+
+    this.getGameDetails(gameId).subscribe(
       data => {
         const totalPeriods = data['g']['p'];
         for ( let i = 5; i <= totalPeriods; ++i ) {
@@ -37,71 +65,76 @@ export class AppComponent {
         this.visitingScore = data['g']['vls']['s'];
         this.parseRoster(data['g']['hls']['pstsg'], this.homeTeam);
         this.parseRoster(data['g']['vls']['pstsg'], this.visitingTeam);
+
+        this.getPbp(gameId).subscribe(
+          data => {
+            this.buildRotations(data);
+          }
+        );
       }
     );
+  }
 
-    this.getPbp().subscribe(
-      data => {
-        // bugged if you play a whole period without subbing and without game activity
-        for ( let period of data['g']['pd'] ) {
-          for ( let event of period['pla'] ) {
-            if ( event['etype'] === 8 ) { // substitution
-              let playerInId = event['epid'];
-              let playerOutId = event['pid'];
-              let seconds = this.clockToSecondsElapsed(event['cl']);
+  buildRotations(data): void {
+    // bugged if you play a whole period without subbing and without game activity
+    for ( let period of data['g']['pd'] ) {
+      for ( let event of period['pla'] ) {
+        if ( event['etype'] === 8 ) { // substitution
+          let playerInId = event['epid'];
+          let playerOutId = event['pid'];
+          let seconds = this.clockToSecondsElapsed(event['cl']);
 
-              // substitute IN
-              this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].inGame = false;
-              this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = seconds;
-              this.players[playerInId].rotations.push(new Rotation(true, seconds));
+          // substitute IN
+          this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].inGame = false;
+          this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].endTime = seconds;
+          this.players[playerInId].rotations.push(new Rotation(true, seconds));
 
-              // subsitute OUT
-              this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].inGame = true;
-              this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
-              this.players[playerOutId].rotations.push(new Rotation(false,seconds));
-            }
-            else if ( event['etype'] === 13 ) { // end of period
-              ++this.period;
-              for( let id of Object.keys(this.players) ) {
-                this.players[id].rotations[this.players[id].rotations.length - 1].endTime = this.periodStartTime(this.period);
-                this.players[id].rotations.push(new Rotation(false, this.periodStartTime(this.period)));
-              }
-            } else if ( event['etype'] === 0 ) { // end of game
-              for( let id of Object.keys(this.players) ) {
-                this.players[id].rotations.pop();
-              }
-            } else {
-              if ( event['etype'] === 1 || event['etype'] == 3 ) {
-                if ( this.chartHeight < event['hs']-event['vs'] ) {
-                  this.chartHeight = event['hs']-event['vs'];
-                }
-                this.scores.push( new ScoreDifferential(event['hs']-event['vs'], this.clockToSecondsElapsed(event['cl'])));
-              }
-              const pid = event['pid'];
-              const epid = event['epid'];
-              if ( this.players[pid] ) {
-                this.players[pid].rotations[this.players[pid].rotations.length - 1].inGame = true;
-              }
-              if ( this.players[epid] ) {
-                this.players[epid].rotations[this.players[epid].rotations.length - 1].inGame = true;
-              }
-            }
-          }
+          // subsitute OUT
+          this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].inGame = true;
+          this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
+          this.players[playerOutId].rotations.push(new Rotation(false,seconds));
         }
-        // merge continous play over quarters
-        for( let id of Object.keys(this.players) ) {
-          let i = 0;
-          while ( i < this.players[id].rotations.length - 1 ) {
-            if ( this.players[id].rotations[i].inGame === this.players[id].rotations[i+1].inGame ) {
-              this.players[id].rotations[i].endTime = this.players[id].rotations[i+1].endTime;
-              this.players[id].rotations.splice(i+1, 1);
-            } else {
-              ++i;
+        else if ( event['etype'] === 13 ) { // end of period
+          ++this.period;
+          for( let id of Object.keys(this.players) ) {
+            this.players[id].rotations[this.players[id].rotations.length - 1].endTime = this.periodStartTime(this.period);
+            this.players[id].rotations.push(new Rotation(false, this.periodStartTime(this.period)));
+          }
+        } else if ( event['etype'] === 0 ) { // end of game
+          for( let id of Object.keys(this.players) ) {
+            this.players[id].rotations.pop();
+          }
+        } else {
+          if ( event['etype'] === 1 || event['etype'] == 3 ) {
+            if ( this.chartHeight < event['hs']-event['vs'] ) {
+              this.chartHeight = event['hs']-event['vs'];
             }
+            this.scores.push( new ScoreDifferential(event['hs']-event['vs'], this.clockToSecondsElapsed(event['cl'])));
+          }
+          const pid = event['pid'];
+          const epid = event['epid'];
+          if ( this.players[pid] ) {
+            this.players[pid].rotations[this.players[pid].rotations.length - 1].inGame = true;
+          }
+          if ( this.players[epid] ) {
+            this.players[epid].rotations[this.players[epid].rotations.length - 1].inGame = true;
           }
         }
       }
-    );
+    }
+    // merge continous play over quarters
+    for( let id of Object.keys(this.players) ) {
+      let i = 0;
+      while ( i < this.players[id].rotations.length - 1 ) {
+        if ( this.players[id].rotations[i].inGame === this.players[id].rotations[i+1].inGame ) {
+          this.players[id].rotations[i].endTime = this.players[id].rotations[i+1].endTime;
+          this.players[id].rotations.splice(i+1, 1);
+        } else {
+          ++i;
+        }
+      }
+    }
+    this.chartReady = true;
   }
 
   periodStartTime(period: number): number {
@@ -130,23 +163,30 @@ export class AppComponent {
           player['fn'],
           player['ln'],
           team,
-          [ new Rotation(player['court'] === 1, 0) ]
+          [ new Rotation(false, 0) ]
         );
       }
     }
   }
 
-  getPbp() {
-    // return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/pbp/0021701225_full_pbp.json');
-    return this.http.get('./assets/pbp.json');
+  getPbp(gameId:string) {
+    return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/pbp/' + gameId + '_full_pbp.json');
+    // return this.http.get('./assets/pbp.json');
   }
 
-  getGameDetails() {
-    // return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/gamedetail/0021701225_gamedetail.json');
-    return this.http.get('./assets/details.json');
+  getGameDetails(gameId:string) {
+    return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/gamedetail/' + gameId + '_gamedetail.json');
+    // return this.http.get('./assets/details.json');
   }
 
-  //http://stats.nba.com/js/data/widgets/boxscore_breakdown_20180411.json
+  getBoxScores() {
+    return this.http.get('https://cors-anywhere.herokuapp.com/' + 'http://data.nba.net/data/10s/prod/v1/20180411/scoreboard.json');
+    // return this.http.get('./assets/boxscore.json');
+  }
+
+  changeGame(id: string) {
+    this.generateChart(id);
+  }
 }
 
 class Player {
@@ -165,6 +205,28 @@ class Player {
     this.lastName = lastName;
     this.team = team;
     this.rotations = rotations;
+  }
+}
+
+class Game {
+  id: string;
+  homeTeam: string;
+  visitingTeam: string;
+  homeScore: number;
+  visitingScore: number;
+
+  constructor(
+    id: string,
+    homeTeam: string,
+    visitingTeam: string,
+    homeScore: number,
+    visitingScore: number
+  ) {
+    this.id = id;
+    this.homeTeam = homeTeam;
+    this.visitingTeam = visitingTeam;
+    this.homeScore = homeScore;
+    this.visitingScore = visitingScore;
   }
 }
 
