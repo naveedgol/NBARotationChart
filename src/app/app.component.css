@@ -46,26 +46,16 @@
 
 .scoreboard {
     text-align: center;
-    height: 170px;
-    margin-bottom: 5px;
+    height: 60px;
+    margin-top: 1.5%;
+    margin-bottom: 1.5%;
 }
 
 .score {
-    font-size: 70px;
+    font-size: 50px;
     display: inline-block;
     vertical-align: top;
-    margin-top: 45px;
-}
-
-@media screen and (max-width: 600px) {
-    .scoreboard {
-        height: 90px;
-        margin-bottom: 5px;
-    }
-    .score {
-        margin-top: 25px;
-        font-size: 35px;
-    }
+    padding: 0 10px;
 }
 
 .team-logo {
@@ -120,7 +110,7 @@
 }
 
 .today-scores {
-    height: 50px;
+    height: 40px;
     white-space: nowrap;
     width: 100%;
     overflow-x: scroll;
@@ -138,4 +128,31 @@
 .loading {
     font-size: 40px;
     text-align: center;
+}
+
+@keyframes blink {
+    0% {
+      opacity: .2;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: .2;
+    }
+}
+
+.loading span {
+    animation-name: blink;
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+}
+
+.loading span:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.loading span:nth-child(3) {
+    animation-delay: .4s;
 }

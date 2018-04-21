@@ -7,14 +7,17 @@
         </div>
     </div>
 
-    <div class="loading" *ngIf="!chartReady">...</div>
+    <p *ngIf="!chartReady" class="loading">
+        <span>.</span><span>.</span><span>.</span>
+    </p>
+
     <div *ngIf="chartReady">
 
         <div class="scoreboard">
-            <span class="score">{{homeScore}}</span>
             <img class="team-logo" [src]="homeTeam ? './assets/logos/' + homeTeam + '.svg' : ''">
-            <img class="team-logo" [src]="visitingTeam ? './assets/logos/' + visitingTeam + '.svg': ''">
+            <span class="score">{{homeScore}}</span>
             <span class="score">{{visitingScore}}</span>
+            <img class="team-logo" [src]="visitingTeam ? './assets/logos/' + visitingTeam + '.svg': ''">
         </div>
 
         <div class="header">
