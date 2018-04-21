@@ -12,13 +12,13 @@ export class AppComponent {
   visitingTeam: string;
   homeScore: number;
   visitingScore: number;
-  playerIds: Player[][] = [[],[]];
+  playerIds: Player[][] = [[], []];
 
   chartReady = false;
   period = 1;
-  allPeriods = [1,2,3,4];
+  allPeriods = [1, 2, 3, 4];
   players: Map<number, Player> = new Map<number, Player>();
-  totalGameTime = this.periodStartTime(4+1);
+  totalGameTime = this.periodStartTime(4 + 1);
 
   scores: ScoreDifferential[] = [new ScoreDifferential(0, 0)];
   chartHeight = 0;
@@ -28,7 +28,7 @@ export class AppComponent {
   constructor( private http: HttpClient) {
     this.getBoxScores().subscribe(
       data => {
-        for ( let game of data['games'] ) {
+        for ( const game of data['games'] ) {
           this.games.push(new Game(
             game['gameId'],
             game['hTeam']['triCode'],
@@ -46,9 +46,9 @@ export class AppComponent {
 
     this.chartReady = false;
     this.players = new Map<number, Player>();
-    this.playerIds = [[],[]];
+    this.playerIds = [[], []];
     this.period = 1;
-    this.allPeriods = [1,2,3,4];
+    this.allPeriods = [1, 2, 3, 4];
     this.scores = [new ScoreDifferential(0, 0)];
     this.chartHeight = 0;
 
@@ -67,8 +67,8 @@ export class AppComponent {
         this.parseRoster(data['g']['vls']['pstsg'], this.visitingTeam);
 
         this.getPbp(gameId).subscribe(
-          data => {
-            this.buildRotations(data);
+          pbp => {
+            this.buildRotations(pbp);
           }
         );
       }
@@ -77,12 +77,12 @@ export class AppComponent {
 
   buildRotations(data): void {
     // bugged if you play a whole period without subbing and without game activity
-    for ( let period of data['g']['pd'] ) {
-      for ( let event of period['pla'] ) {
+    for ( const period of data['g']['pd'] ) {
+      for ( const event of period['pla'] ) {
         if ( event['etype'] === 8 ) { // substitution
-          let playerInId = event['epid'];
-          let playerOutId = event['pid'];
-          let seconds = this.clockToSecondsElapsed(event['cl']);
+          const playerInId = event['epid'];
+          const playerOutId = event['pid'];
+          const seconds = this.clockToSecondsElapsed(event['cl']);
 
           // substitute IN
           this.players[playerInId].rotations[this.players[playerInId].rotations.length - 1].inGame = false;
@@ -92,24 +92,23 @@ export class AppComponent {
           // subsitute OUT
           this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].inGame = true;
           this.players[playerOutId].rotations[this.players[playerOutId].rotations.length - 1].endTime = seconds;
-          this.players[playerOutId].rotations.push(new Rotation(false,seconds));
-        }
-        else if ( event['etype'] === 13 ) { // end of period
+          this.players[playerOutId].rotations.push(new Rotation(false, seconds));
+        } else if ( event['etype'] === 13 ) { // end of period
           ++this.period;
-          for( let id of Object.keys(this.players) ) {
+          for ( const id of Object.keys(this.players) ) {
             this.players[id].rotations[this.players[id].rotations.length - 1].endTime = this.periodStartTime(this.period);
             this.players[id].rotations.push(new Rotation(false, this.periodStartTime(this.period)));
           }
         } else if ( event['etype'] === 0 ) { // end of game
-          for( let id of Object.keys(this.players) ) {
+          for ( const id of Object.keys(this.players) ) {
             this.players[id].rotations.pop();
           }
         } else {
-          if ( event['etype'] === 1 || event['etype'] == 3 ) {
-            if ( this.chartHeight < event['hs']-event['vs'] ) {
-              this.chartHeight = event['hs']-event['vs'];
+          if ( event['etype'] === 1 || event['etype'] === 3 ) {
+            if ( this.chartHeight < event['hs'] - event['vs'] ) {
+              this.chartHeight = event['hs'] - event['vs'];
             }
-            this.scores.push( new ScoreDifferential(event['hs']-event['vs'], this.clockToSecondsElapsed(event['cl'])));
+            this.scores.push( new ScoreDifferential(event['hs'] - event['vs'], this.clockToSecondsElapsed(event['cl'])));
           }
           const pid = event['pid'];
           const epid = event['epid'];
@@ -123,12 +122,12 @@ export class AppComponent {
       }
     }
     // merge continous play over quarters
-    for( let id of Object.keys(this.players) ) {
+    for ( const id of Object.keys(this.players) ) {
       let i = 0;
       while ( i < this.players[id].rotations.length - 1 ) {
-        if ( this.players[id].rotations[i].inGame === this.players[id].rotations[i+1].inGame ) {
-          this.players[id].rotations[i].endTime = this.players[id].rotations[i+1].endTime;
-          this.players[id].rotations.splice(i+1, 1);
+        if ( this.players[id].rotations[i].inGame === this.players[id].rotations[i + 1].inGame ) {
+          this.players[id].rotations[i].endTime = this.players[id].rotations[i + 1].endTime;
+          this.players[id].rotations.splice(i + 1, 1);
         } else {
           ++i;
         }
@@ -138,20 +137,20 @@ export class AppComponent {
   }
 
   periodStartTime(period: number): number {
-    if( period <= 4 ) { // regulation
-      return 60*12*(period-1);
+    if ( period <= 4 ) { // regulation
+      return 60 * 12 * (period - 1);
     } else { // OT
-      return 60*12*4 + 60*5*(period-5);
+      return 60 * 12 * 4 + 60 * 5 * (period - 5);
     }
   }
 
   clockToSecondsElapsed(clock: string): number {
     // XX:XX to seconds
-    return this.periodStartTime(this.period + 1) - (parseInt(clock.substring(0,2))*60 + parseInt(clock.substring(3,5)));
+    return this.periodStartTime(this.period + 1) - (parseInt(clock.substring(0, 2), 10) * 60 + parseInt(clock.substring(3, 5), 10));
   }
 
   parseRoster(rosterJson, team: string) {
-    for( let player of rosterJson ) {
+    for ( const player of rosterJson ) {
       if ( player['min'] ) { // if the player plays
         if ( team === this.homeTeam ) {
           this.playerIds[0].push(player['pid']);
@@ -169,19 +168,28 @@ export class AppComponent {
     }
   }
 
-  getPbp(gameId:string) {
-    return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/pbp/' + gameId + '_full_pbp.json');
-    // return this.http.get('./assets/pbp.json');
+  getPbp(gameId: string) {
+    return this.http.get(
+      'https://cors-anywhere.herokuapp.com/'
+      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/pbp/'
+      + gameId + '_full_pbp.json'
+    );
   }
 
-  getGameDetails(gameId:string) {
-    return this.http.get('https://cors-anywhere.herokuapp.com/' + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/gamedetail/' + gameId + '_gamedetail.json');
-    // return this.http.get('./assets/details.json');
+  getGameDetails(gameId: string) {
+    return this.http.get(
+      'https://cors-anywhere.herokuapp.com/'
+      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/scores/gamedetail/'
+      + gameId + '_gamedetail.json'
+    );
   }
 
   getBoxScores() {
-    return this.http.get('https://cors-anywhere.herokuapp.com/' + 'http://data.nba.net/data/10s/prod/v1/20180411/scoreboard.json');
-    // return this.http.get('./assets/boxscore.json');
+    return this.http.get(
+      'https://cors-anywhere.herokuapp.com/'
+      + 'http://data.nba.net/data/10s/prod/v1/'
+      + '20180411' + '/scoreboard.json'
+    );
   }
 
   changeGame(id: string) {
@@ -247,8 +255,8 @@ class Rotation {
 }
 
 class ScoreDifferential {
-  differential: number; // point differential
-  time: number; //time since last point
+  differential: number;
+  time: number;
 
   constructor(differential, time) {
     this.differential = differential;
