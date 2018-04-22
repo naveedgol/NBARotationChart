@@ -171,7 +171,7 @@ export class AppComponent {
 
   parseRoster(rosterJson, team: string) {
     for ( const player of rosterJson ) {
-      if ( player['min'] ) { // if the player plays
+      if ( player['totsec'] ) { // if the player plays
         if ( team === this.homeTeam ) {
           this.playerIds[0].push(player['pid']);
         } else {
