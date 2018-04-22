@@ -1,10 +1,16 @@
 <div class="main">
 
+    <div class="change-day" (click)="currentDate.setDate(currentDate.getDate() - 1); generateBoxScores();">
+        ◀
+    </div>
     <div class="today-scores">
         <div class="boxscore" *ngFor="let game of games" (click)="changeGame(game.id)">
             <span>{{game.homeTeam}}</span><span class="boxscore-score">{{game.homeScore}}</span><br>
             <span>{{game.visitingTeam}}</span><span class="boxscore-score">{{game.visitingScore}}</span>
         </div>
+    </div>
+    <div class="change-day" (click)="currentDate.setDate(currentDate.getDate() + 1);generateBoxScores();">
+        ▶
     </div>
 
     <p *ngIf="!chartReady" class="loading">

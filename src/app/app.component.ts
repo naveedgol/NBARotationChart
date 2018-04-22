@@ -24,9 +24,10 @@ export class AppComponent {
   chartHeight = 0;
 
   games: Game[] = [];
+  currentDate: Date = new Date();
 
   constructor( private http: HttpClient) {
-    this.getBoxScores().subscribe(
+    this.getBoxScores(this.currentDate).subscribe(
       data => {
         for ( const game of data['games'] ) {
           this.games.push(new Game(
@@ -38,6 +39,23 @@ export class AppComponent {
           ));
         }
         this.generateChart(this.games[0].id);
+      }
+    );
+  }
+
+  generateBoxScores() {
+    this.getBoxScores(this.currentDate).subscribe(
+      data => {
+        this.games = [];
+        for ( const game of data['games'] ) {
+          this.games.push(new Game(
+            game['gameId'],
+            game['hTeam']['triCode'],
+            game['vTeam']['triCode'],
+            game['hTeam']['score'],
+            game['vTeam']['score']
+          ));
+        }
       }
     );
   }
@@ -184,16 +202,23 @@ export class AppComponent {
     );
   }
 
-  getBoxScores() {
+  getBoxScores(date: Date) {
     return this.http.get(
       'https://cors-anywhere.herokuapp.com/'
       + 'http://data.nba.net/data/10s/prod/v1/'
-      + '20180411' + '/scoreboard.json'
+      + date.getFullYear() + this.padNumber((date.getMonth() + 1)) + this.padNumber(date.getDate()) + '/scoreboard.json'
     );
   }
 
   changeGame(id: string) {
     this.generateChart(id);
+  }
+
+  padNumber(num: number): string {
+    if ( num < 10 ) {
+      return '0' + num.toString();
+    }
+    return num.toString();
   }
 }
 

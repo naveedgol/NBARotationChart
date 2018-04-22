@@ -103,6 +103,7 @@
     display: inline-block;
     cursor: pointer;
     opacity: 0.8;
+    vertical-align: top;
 }
 
 .boxscore:hover {
@@ -110,9 +111,10 @@
 }
 
 .today-scores {
+    display: inline-block;
     height: 40px;
     white-space: nowrap;
-    width: 100%;
+    max-width: calc(100% - 42px);
     overflow-x: scroll;
     overflow-y: hidden;
 }
@@ -155,4 +157,17 @@
 
 .loading span:nth-child(3) {
     animation-delay: .4s;
+}
+
+.change-day {
+    height: 40px;
+    width: 20px;
+    display: inline-block;
+    font-size: 12px;
+    background: #eaeaea;
+    border-right: 1px #F6F6F6 solid;
+    text-align: center;
+    cursor: pointer;
+    vertical-align: top;
+    line-height: 40px;
 }
