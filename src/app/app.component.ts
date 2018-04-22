@@ -37,11 +37,11 @@ export class AppComponent {
             game['vTeam']['triCode'],
             game['hTeam']['score'],
             game['vTeam']['score'],
-            game['statusNum'] !== 1
+            game['statusNum'] === 3
           ));
         }
         if ( this.games.length ) {
-          if ( this.games[0].hasStarted ) {
+          if ( this.games[0].final ) {
             this.gameSelected = this.games[0];
             this.generateChart(this.games[0].id);
           }
@@ -227,7 +227,7 @@ export class AppComponent {
   }
 
   changeGame(game: Game) {
-    if ( this.gameSelected === game || !game.hasStarted) {
+    if ( this.gameSelected === game || !game.final) {
       return;
     }
     this.gameSelected = game;
@@ -267,7 +267,7 @@ class Game {
   visitingTeam: string;
   homeScore: number;
   visitingScore: number;
-  hasStarted: boolean;
+  final: boolean;
 
   constructor(
     id: string,
@@ -275,14 +275,14 @@ class Game {
     visitingTeam: string,
     homeScore: number,
     visitingScore: number,
-    hasStarted: boolean
+    final: boolean
   ) {
     this.id = id;
     this.homeTeam = homeTeam;
     this.visitingTeam = visitingTeam;
     this.homeScore = homeScore;
     this.visitingScore = visitingScore;
-    this.hasStarted = hasStarted;
+    this.final = final;
   }
 }
 

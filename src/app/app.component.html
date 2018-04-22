@@ -5,7 +5,7 @@
     </div>
     <div class="today-scores">
         <ng-container *ngFor="let game of games">
-            <div class="{{game.hasStarted ? 'boxscore-active' : 'boxscore-inactive'}}" (click)="changeGame(game)">
+            <div class="{{game.final ? 'boxscore-active' : 'boxscore-inactive'}}" (click)="changeGame(game)">
                 <span>{{game.homeTeam}}</span><span class="boxscore-score">{{game.homeScore}}</span><br>
                 <span>{{game.visitingTeam}}</span><span class="boxscore-score">{{game.visitingScore}}</span>
             </div>
@@ -16,7 +16,7 @@
     </div>
 
     <p *ngIf="!gameSelected" class="select-prompt">
-        No games have started today.<br>Select one from a previous date.
+        No games have finished today.<br>Select one from a previous date.
     </p>
     <p *ngIf="!chartReady && gameSelected" class="loading">
         <span>.</span><span>.</span><span>.</span>
