@@ -4,16 +4,21 @@
         ◀
     </div>
     <div class="today-scores">
-        <div class="boxscore" *ngFor="let game of games" (click)="changeGame(game.id)">
-            <span>{{game.homeTeam}}</span><span class="boxscore-score">{{game.homeScore}}</span><br>
-            <span>{{game.visitingTeam}}</span><span class="boxscore-score">{{game.visitingScore}}</span>
-        </div>
+        <ng-container *ngFor="let game of games">
+            <div class="{{game.hasStarted ? 'boxscore-active' : 'boxscore-inactive'}}" (click)="changeGame(game)">
+                <span>{{game.homeTeam}}</span><span class="boxscore-score">{{game.homeScore}}</span><br>
+                <span>{{game.visitingTeam}}</span><span class="boxscore-score">{{game.visitingScore}}</span>
+            </div>
+        </ng-container>
     </div>
     <div class="change-day" (click)="currentDate.setDate(currentDate.getDate() + 1);generateBoxScores();">
         ▶
     </div>
 
-    <p *ngIf="!chartReady" class="loading">
+    <p *ngIf="!gameSelected" class="select-prompt">
+        No games have started today.<br>Select one from a previous date.
+    </p>
+    <p *ngIf="!chartReady && gameSelected" class="loading">
         <span>.</span><span>.</span><span>.</span>
     </p>
 

@@ -60,6 +60,7 @@
 
 .team-logo {
     height: 100%;
+    filter: drop-shadow(3px 3px 4px grey);
 }
 
 .period-line {
@@ -92,7 +93,7 @@
     display: inline-block;
 }
 
-.boxscore {
+.boxscore-active {
     width: 90px;
     height: 100%;
     padding: 4px 6px;
@@ -106,8 +107,21 @@
     vertical-align: top;
 }
 
-.boxscore:hover {
+.boxscore-active:hover {
     opacity: 1;
+}
+
+.boxscore-inactive {
+    width: 90px;
+    height: 100%;
+    padding: 4px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #eaeaea;
+    border-right: 1px #F6F6F6 solid;
+    display: inline-block;
+    opacity: 0.5;
+    vertical-align: top;
 }
 
 .today-scores {
@@ -190,4 +204,10 @@
 .scale-mark span {
     margin-right: 2px;
     color: gray;
+}
+
+.select-prompt {
+    font-size: 20px;
+    text-align: center;
+    margin-top: 50px;
 }

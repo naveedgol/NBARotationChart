@@ -25,6 +25,7 @@ export class AppComponent {
 
   games: Game[] = [];
   currentDate: Date = new Date();
+  gameSelected: Game;
 
   constructor( private http: HttpClient) {
     this.getBoxScores(this.currentDate).subscribe(
@@ -35,10 +36,16 @@ export class AppComponent {
             game['hTeam']['triCode'],
             game['vTeam']['triCode'],
             game['hTeam']['score'],
-            game['vTeam']['score']
+            game['vTeam']['score'],
+            game['statusNum'] !== 1
           ));
         }
-        this.generateChart(this.games[0].id);
+        if ( this.games.length ) {
+          if ( this.games[0].hasStarted ) {
+            this.gameSelected = this.games[0];
+            this.generateChart(this.games[0].id);
+          }
+        }
       }
     );
   }
@@ -53,7 +60,8 @@ export class AppComponent {
             game['hTeam']['triCode'],
             game['vTeam']['triCode'],
             game['hTeam']['score'],
-            game['vTeam']['score']
+            game['vTeam']['score'],
+            game['statusNum'] !== 1
           ));
         }
       }
@@ -81,8 +89,14 @@ export class AppComponent {
         this.homeScore = data['g']['hls']['s'];
         this.visitingTeam = data['g']['vls']['ta'];
         this.visitingScore = data['g']['vls']['s'];
-        this.parseRoster(data['g']['hls']['pstsg'], this.homeTeam);
-        this.parseRoster(data['g']['vls']['pstsg'], this.visitingTeam);
+
+        if ( data['g']['hls']['pstsg'] && data['g']['vls']['pstsg'] ) {
+          this.parseRoster(data['g']['hls']['pstsg'], this.homeTeam);
+          this.parseRoster(data['g']['vls']['pstsg'], this.visitingTeam);
+        } else {
+          console.log('Game hasnt begun.');
+          return;
+        }
 
         this.getPbp(gameId).subscribe(
           pbp => {
@@ -212,8 +226,12 @@ export class AppComponent {
     );
   }
 
-  changeGame(id: string) {
-    this.generateChart(id);
+  changeGame(game: Game) {
+    if ( this.gameSelected === game || !game.hasStarted) {
+      return;
+    }
+    this.gameSelected = game;
+    this.generateChart(game.id);
   }
 
   padNumber(num: number): string {
@@ -249,19 +267,22 @@ class Game {
   visitingTeam: string;
   homeScore: number;
   visitingScore: number;
+  hasStarted: boolean;
 
   constructor(
     id: string,
     homeTeam: string,
     visitingTeam: string,
     homeScore: number,
-    visitingScore: number
+    visitingScore: number,
+    hasStarted: boolean
   ) {
     this.id = id;
     this.homeTeam = homeTeam;
     this.visitingTeam = visitingTeam;
     this.homeScore = homeScore;
     this.visitingScore = visitingScore;
+    this.hasStarted = hasStarted;
   }
 }
 
