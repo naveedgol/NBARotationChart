@@ -1,6 +1,6 @@
 # NBARotationChart
 
-[example.png](./example.png)
+![example.png](./example.png)
 
 ## Development server
 
