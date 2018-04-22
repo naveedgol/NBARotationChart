@@ -32,13 +32,13 @@
                 <span
                     *ngIf="period <= 4"
                     class="period-header"
-                    [style.width.%]="88/totalGameTime*(12*60)">
+                    [style.width.%]="86/totalGameTime*(12*60)">
                         Q{{period}}
                 </span>
                 <span
                     *ngIf="period > 4"
                     class="period-header"
-                    [style.width.%]="88/totalGameTime*(5*60)"
+                    [style.width.%]="86/totalGameTime*(5*60)"
                 >
                     OT{{period-4}}
                 </span>
@@ -46,23 +46,32 @@
         </div>
 
         <div class="data">
+
             <div
                 *ngFor="let period of allPeriods"
                 class="period-line"
                 [style.height.px]="(playerIds[0].length+playerIds[1].length)*23 + 27"
-                [style.left.%]="11 + 88/totalGameTime*periodStartTime(period)">
+                [style.left.%]="11 + 86/totalGameTime*periodStartTime(period)">
             </div>
             <div class="middle-divisor" [style.margin-top.px]="23*playerIds[0].length + 15"></div>
+            <div class="score-axis" [style.height.px]="(playerIds[0].length+playerIds[1].length)*23 + 27">
+                <div *ngFor="let mark of [-25,-20,-15,-10,-5,0,5,10,15,20,25]"
+                    class="scale-mark"
+                    [style.margin-top.px]="23*playerIds[0].length + 15 - 7*mark">
+                    <span>-</span>{{mark}}
+                </div>
+            </div>
+
             <div
                 class="score-chart"
-                [style.margin-top.px]="23*playerIds[0].length - chartHeight*5 + 15">
+                [style.margin-top.px]="23*playerIds[0].length - chartHeight*7 + 15">
                 <div class="player-name"></div>
                 <ng-container *ngFor="let score of scores; let i = index">
                     <span
                         [class]="'score-bar' + ' ' + ( score.differential > 0 ? homeTeam : visitingTeam)"
-                        [style.height.px]="score.differential < 0 ? score.differential*-5 : score.differential*5"
-                        [style.width.%]="i+1 !== scores.length ? (scores[i+1].time-score.time)/totalGameTime*88 : 0"
-                        [style.margin-bottom.px]="score.differential < 0 ? score.differential*5 : 0"
+                        [style.height.px]="score.differential < 0 ? score.differential*-7 : score.differential*7"
+                        [style.width.%]="i+1 !== scores.length ? (scores[i+1].time-score.time)/totalGameTime*86 : 0"
+                        [style.margin-bottom.px]="score.differential < 0 ? score.differential*7 : 0"
                         [style.border-radius]="score.differential < 0 ? '0px 0px 2px 2px' : '2px 2px 0px 0px'"
                     >
                 </span>
@@ -75,7 +84,7 @@
                     </span>
                     <ng-container *ngFor="let rotation of players[playerId].rotations">
                         <span class="subbed-in"
-                            [style.width.%]="(rotation.endTime - rotation.startTime)/totalGameTime*88"
+                            [style.width.%]="(rotation.endTime - rotation.startTime)/totalGameTime*86"
                             [style.visibility]="rotation.inGame ? 'visible' : 'hidden'">
                         </span>
                     </ng-container>
@@ -90,13 +99,13 @@
                 <span
                     *ngIf="period <= 4"
                     class="period-header"
-                    [style.width.%]="88/totalGameTime*(12*60)">
+                    [style.width.%]="86/totalGameTime*(12*60)">
                         Q{{period}}
                 </span>
                 <span
                     *ngIf="period > 4"
                     class="period-header"
-                    [style.width.%]="88/totalGameTime*(5*60)"
+                    [style.width.%]="86/totalGameTime*(5*60)"
                 >
                     OT{{period-4}}
                 </span>

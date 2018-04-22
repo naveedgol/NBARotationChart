@@ -73,7 +73,7 @@
     height: 2px;
     background-color: grey;
     position: absolute;
-    width: 88%;
+    width: 86%;
     left: 11%;
 }
 
@@ -170,4 +170,24 @@
     cursor: pointer;
     vertical-align: top;
     line-height: 40px;
+}
+
+.score-axis {
+    height: 487px;
+    left: 97%;
+    width: 3%;
+    position: absolute;
+    border-left: 2px solid gray;
+}
+
+.scale-mark {
+    font-size: 13px;
+    line-height: 0;
+    position: absolute;
+    margin-left: -1px;
+}
+
+.scale-mark span {
+    margin-right: 2px;
+    color: gray;
 }

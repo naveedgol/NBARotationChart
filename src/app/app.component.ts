@@ -151,6 +151,8 @@ export class AppComponent {
         }
       }
     }
+
+    this.scores.push(new ScoreDifferential(this.scores[this.scores.length - 1].differential, this.totalGameTime));
     this.chartReady = true;
   }
 
