@@ -126,10 +126,6 @@ MIT
 MIT
 MIT
 
-@types/q@0.0.32
-MIT
-MIT
-
 @angular/platform-browser-dynamic@5.2.9
 MIT
 MIT
