@@ -125,6 +125,7 @@
 }
 
 .today-scores {
+    text-align: left;
     display: inline-block;
     height: 40px;
     white-space: nowrap;
@@ -144,6 +145,13 @@
 .loading {
     font-size: 40px;
     text-align: center;
+}
+
+.loading-ticker {
+    display: inline-block;
+    font-size: 25px;
+    height: 40px;
+    vertical-align: top;
 }
 
 @keyframes blink {
@@ -210,4 +218,13 @@
     font-size: 20px;
     text-align: center;
     margin-top: 50px;
+}
+
+.ticker {
+    display: inline-block;
+    text-align: center;
+}
+
+.current-date {
+    font-size: 10px;
 }

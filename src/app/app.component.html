@@ -1,18 +1,26 @@
 <div class="main">
 
-    <div class="change-day" (click)="currentDate.setDate(currentDate.getDate() - 1); generateBoxScores();">
-        ◀
-    </div>
-    <div class="today-scores">
-        <ng-container *ngFor="let game of games">
-            <div class="{{game.final ? 'boxscore-active' : 'boxscore-inactive'}}" (click)="changeGame(game)">
-                <span>{{game.homeTeam}}</span><span class="boxscore-score">{{game.homeScore}}</span><br>
-                <span>{{game.visitingTeam}}</span><span class="boxscore-score">{{game.visitingScore}}</span>
-            </div>
-        </ng-container>
-    </div>
-    <div class="change-day" (click)="currentDate.setDate(currentDate.getDate() + 1);generateBoxScores();">
-        ▶
+    <div class="ticker">
+        <div class="change-day" (click)="setDate(-1); generateBoxScores();">
+            ◀
+        </div>
+        <div class="today-scores">
+            <ng-container *ngFor="let game of games">
+                <div class="{{game.final ? 'boxscore-active' : 'boxscore-inactive'}}" (click)="changeGame(game)">
+                    <span>{{game.homeTeam}}</span><span class="boxscore-score">{{game.homeScore}}</span><br>
+                    <span>{{game.visitingTeam}}</span><span class="boxscore-score">{{game.visitingScore}}</span>
+                </div>
+            </ng-container>
+        </div>
+        <p *ngIf="loadingBoxScore" class="loading loading-ticker">
+            <span>.</span><span>.</span><span>.</span>
+        </p>
+        <div class="change-day" (click)="setDate(1);generateBoxScores();">
+            ▶
+        </div>
+        <div class="current-date">
+            {{currentDate | date}}
+        </div>
     </div>
 
     <p *ngIf="!gameSelected" class="select-prompt">

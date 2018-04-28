@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { timeout } from 'q';
 
 @Component({
   selector: 'app-root',
@@ -26,10 +25,12 @@ export class AppComponent {
   games: Game[] = [];
   currentDate: Date = new Date();
   gameSelected: Game;
+  loadingBoxScore = true;
 
   constructor( private http: HttpClient) {
     this.getBoxScores(this.currentDate).subscribe(
       data => {
+        this.loadingBoxScore = false;
         for ( const game of data['games'] ) {
           this.games.push(new Game(
             game['gameId'],
@@ -51,9 +52,11 @@ export class AppComponent {
   }
 
   generateBoxScores() {
+    this.games = [];
+    this.loadingBoxScore = true;
     this.getBoxScores(this.currentDate).subscribe(
       data => {
-        this.games = [];
+        this.loadingBoxScore = false;
         for ( const game of data['games'] ) {
           this.games.push(new Game(
             game['gameId'],
@@ -239,6 +242,10 @@ export class AppComponent {
       return '0' + num.toString();
     }
     return num.toString();
+  }
+
+  setDate(direction: number) {
+    this.currentDate = new Date( this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate() + direction );
   }
 }
 
