@@ -130,7 +130,6 @@
     height: 40px;
     white-space: nowrap;
     max-width: calc(100% - 42px);
-    overflow-x: scroll;
     overflow-y: hidden;
 }
 
@@ -221,6 +220,9 @@
 }
 
 .ticker {
+    max-width: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
     display: inline-block;
     text-align: center;
 }
