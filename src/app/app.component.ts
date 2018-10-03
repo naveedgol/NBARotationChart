@@ -208,7 +208,7 @@ export class AppComponent {
   getPbp(gameId: string) {
     return this.http.get(
       'https://cors-anywhere.herokuapp.com/'
-      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + date.getFullYear() + '/scores/pbp/'
+      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + this.currentDate.getFullYear() + '/scores/pbp/'
       + gameId + '_full_pbp.json'
     );
   }
@@ -216,7 +216,7 @@ export class AppComponent {
   getGameDetails(gameId: string) {
     return this.http.get(
       'https://cors-anywhere.herokuapp.com/'
-      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + date.getFullYear() + '/scores/gamedetail/'
+      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + this.currentDate.getFullYear() + '/scores/gamedetail/'
       + gameId + '_gamedetail.json'
     );
   }
