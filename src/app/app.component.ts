@@ -208,7 +208,7 @@ export class AppComponent {
   getPbp(gameId: string) {
     return this.http.get(
       'https://cors-anywhere.herokuapp.com/'
-      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + this.currentDate.getFullYear() + '/scores/pbp/'
+      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + this.getCurrentSeasonYear() + '/scores/pbp/'
       + gameId + '_full_pbp.json'
     );
   }
@@ -216,7 +216,7 @@ export class AppComponent {
   getGameDetails(gameId: string) {
     return this.http.get(
       'https://cors-anywhere.herokuapp.com/'
-      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + this.currentDate.getFullYear() + '/scores/gamedetail/'
+      + 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/' + this.getCurrentSeasonYear() + '/scores/gamedetail/'
       + gameId + '_gamedetail.json'
     );
   }
@@ -246,6 +246,15 @@ export class AppComponent {
 
   setDate(direction: number) {
     this.currentDate = new Date( this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate() + direction );
+  }
+
+  getCurrentSeasonYear(): number {
+    const julyMonthIndex = 6; // season end
+    if ( this.currentDate.getMonth() <= julyMonthIndex ) {
+      return this.currentDate.getFullYear() - 1;
+    } else {
+      return this.currentDate.getFullYear();
+    }
   }
 }
 
