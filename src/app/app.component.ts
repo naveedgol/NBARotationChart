@@ -249,8 +249,8 @@ export class AppComponent {
   }
 
   getCurrentSeasonYear(): number {
-    const julyMonthIndex = 6; // season end
-    if ( this.currentDate.getMonth() <= julyMonthIndex ) {
+    const septMonthIndex = 9; // season end
+    if ( this.currentDate.getMonth() <= septMonthIndex ) {
       return this.currentDate.getFullYear() - 1;
     } else {
       return this.currentDate.getFullYear();
